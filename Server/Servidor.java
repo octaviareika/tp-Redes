@@ -64,7 +64,6 @@ public class Servidor {
 
             saidaAtual.println("Sua vez. Palavra: " + mascara + " Letras digitadas: " + letrasDigitadas);
             saidaAtual.println("Vez de jogador " + jogadorAtual);
-            saidaOutro.println("Vez do jogador " + jogadorAtual);
             saidaOutro.println("Aguarde a vez do jogador" + jogadorAtual);
             
             
@@ -84,7 +83,8 @@ public class Servidor {
                         if (palavra.charAt(i) == letra){
                             mascara = mascara.substring(0, i) + letra + mascara.substring(i + 1);
                             letraEstaNaPalavra = true;
-                            jogadorAtual = (jogadorAtual == 1) ? 2 : 1;
+                            acertou = true;
+                            //jogadorAtual = (jogadorAtual == 1) ? 2 : 1;
                         }
                     }
 
