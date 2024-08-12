@@ -11,6 +11,10 @@ public class Servidor {
     private static final String[] palavras = {"cachorro", "gato", "elefante", "girafa", "leao", 
     "tigre", "pato", "ganso", "galinha", "papagaio", "pomba", "coruja", "urubu", "pelicano", "avestruz",
     "geladeira", "fogao", "bandeira", "gravata", "camisa", "sapato", "lua", "planta", "arvore", "flor"};
+
+    private static final String[] palavrasDificeis = {"xenofobia", "inconstitucional", "paralelepipedo",
+    "heterodoxo", "onomatopeia", "proparoxitona", "complexidade", "melancolia", "eclesiastico", "metamorfose",
+    "tautologia" };
     private int maximasTentativas;
 
     public Servidor(int maximasTentativas){
@@ -18,12 +22,31 @@ public class Servidor {
     }
 
     public Servidor(){}
-    
-    public String escolherPalavra() {
+
+    // usa true ou false
+    public boolean sortearDificuldade(){
         Random aleatorio = new Random();
-        int indiceAleaorio = aleatorio.nextInt(palavras.length);
+        return aleatorio.nextBoolean();
+    }
+    
+    public String escolherPalavra(String[] palavra) {
+        Random aleatorio = new Random();
+        int indiceAleaorio = aleatorio.nextInt(palavra.length);
 
         return palavras[indiceAleaorio];
+    }
+
+    public int sortearTentativaFacil(){
+        Random random = new Random();
+        this.maximasTentativas = random.nextInt(3) + 3;
+        return this.maximasTentativas;
+    }
+
+    public int sortearTentativaDificil(){
+        Random random = new Random();
+        this.maximasTentativas = random.nextInt(3) + 6;
+        return this.maximasTentativas;
+        
     }
 
     // getter
@@ -43,19 +66,40 @@ public class Servidor {
         return mascara;
     }
 
+    public void limparTela() {
+        // Código de escape ANSI para limpar a tela
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
     public void inicializarJogo(BufferedReader entradaJogador1, PrintWriter saidaJogador1, 
     BufferedReader entradaJogador2, PrintWriter saidaJogador2  ) throws IOException {
+        String palavra;
+        String dificuldade;
 
-        String palavra = escolherPalavra();
+        if (sortearDificuldade()){ // se for dificil 
+            palavra = escolherPalavra(palavrasDificeis);
+            this.maximasTentativas = sortearTentativaDificil();
+            dificuldade = "Dificil";
+        }
+        
+        else {
+            palavra = escolherPalavra(palavras);
+            this.maximasTentativas = sortearTentativaDificil();
+            dificuldade = "Fácil";
+        }
+
+
         String mascara = criarMascara(palavra);
-        //Scanner scanner = new Scanner(System.in);
+        
         int tentativas = 0;
         int jogadorAtual = 1;
         String letrasDigitadas = "";
 
 
         while (!mascara.equals(palavra) && mascara != null && tentativas < this.getMaximoTentativas()) {
-            // letras que ja foram digitadas
+            //limparTela();
+            
             PrintWriter saidaAtual = (jogadorAtual == 1) ? saidaJogador1 : saidaJogador2;
             BufferedReader entradaAtual = (jogadorAtual == 1) ? entradaJogador1 : entradaJogador2;
             PrintWriter saidaOutro = (jogadorAtual == 1) ? saidaJogador2 : saidaJogador1;
@@ -63,6 +107,7 @@ public class Servidor {
             boolean letraEstaNaPalavra = false;
 
             saidaAtual.println("Sua vez. Palavra: " + mascara + " Letras digitadas: " + letrasDigitadas);
+            saidaAtual.println("Dificuldade" + dificuldade);
             saidaAtual.println("Vez de jogador " + jogadorAtual);
             saidaOutro.println("Aguarde a vez do jogador" + jogadorAtual);
             
@@ -84,7 +129,6 @@ public class Servidor {
                             mascara = mascara.substring(0, i) + letra + mascara.substring(i + 1);
                             letraEstaNaPalavra = true;
                             acertou = true;
-                            //jogadorAtual = (jogadorAtual == 1) ? 2 : 1;
                         }
                     }
 
@@ -113,6 +157,8 @@ public class Servidor {
                     saidaAtual.println("Você perdeu! A palavra era: " + palavra);
                     saidaOutro.println("Parabéns! Você acertou a palavra: " + palavra);
                 }
+
+                limparTela();
                 
         }
 
@@ -152,7 +198,7 @@ public class Servidor {
     }
 
     public static void main(String[] args) throws IOException {
-        Servidor servidor = new Servidor(6);
+        Servidor servidor = new Servidor(10);
         servidor.iniciandoConexao();
     }
 }

@@ -5,6 +5,12 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Cliente {
+
+    public static void limparTela() {
+        // Código de escape ANSI para limpar a tela
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
     
     public static void main(String[] args) throws Exception {
         try (Socket socket = new Socket("localhost", 8081)){
@@ -19,11 +25,13 @@ public class Cliente {
             String mensagemServer; // mensagem recebida do servidor
         // enquanto a mensagem do servidor n for nula
             while ((mensagemServer = entrada.readLine()) != null){
+                
                 System.out.println(mensagemServer);
                 if (mensagemServer.startsWith("Sua vez.")){
                     System.out.println("Digite uma letra:");
                     String tentativa = teclado.readLine();
                     saida.println(tentativa);
+                    //limparTela();
                 }
 
                 if (mensagemServer.startsWith("Parabéns!")){
