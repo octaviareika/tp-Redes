@@ -30,7 +30,7 @@ public class Cliente {
                 if (mensagemServer.startsWith("Sua vez.")){
                     System.out.println("Digite uma letra:");
                     String tentativa = teclado.readLine();
-                    saida.println(tentativa);
+                    saida.println("Tentativa: " + tentativa);
                     //limparTela();
                 }
 
