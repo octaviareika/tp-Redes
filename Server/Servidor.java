@@ -109,24 +109,26 @@ public class Servidor {
 
             saidaAtual.println("Sua vez. Palavra: " + mascara + " Letras digitadas: " + letrasDigitadas);
             saidaAtual.println("Dificuldade: " + dificuldade);
+            System.out.println();
             saidaAtual.println("Vez de jogador " + jogadorAtual);
             saidaOutro.println("Aguarde a vez do jogador" + jogadorAtual);
-            saidaAtual.println();
+            System.out.println();
             
             
-            String tentativa = entradaAtual.readLine();
-            letrasDigitadas += tentativa +   " "; // concatena a letra nas que ja foram digitadas
+            String mensagem = entradaAtual.readLine();
+            if (mensagem.startsWith("Tentativa: ")){
+                String tentativa = mensagem.substring(11); // pega a letra digitada
+                letrasDigitadas += tentativa +   " "; // concatena a letra nas que ja foram digitadas
 
-                // verificar se a letra ja foi digitada
+                // verificar se a letra tem na palavra
+            
                 if (palavra.contains(tentativa)){
-                    StringBuilder novaMascara = new StringBuilder(mascara);
-                    boolean acertou = false;
+                    StringBuilder novaMascara = new StringBuilder(mascara); // criar uma nova mascara
                     
                     // se a letra não foi digitada mas está na palavra
                     for (int i = 0; i < palavra.length(); i++){
                         if (palavra.charAt(i) == tentativa.charAt(0)){
                             novaMascara.setCharAt(i, tentativa.charAt(0));
-                            acertou = true;
                         }
                     }
 
@@ -134,23 +136,24 @@ public class Servidor {
                     saidaAtual.println("Letra encontrada!");
 
 
-                    //jogadorAtual = (jogadorAtual == 1) ? 2 : 1;
                 } else {
                     tentativas++;
                     letrasErradas += tentativa + " ";
-                    saidaAtual.println("Letra não encontrada!");
-                    saidaAtual.println("Letras erradas: " + letrasErradas);
-                    //jogadorAtual = (jogadorAtual == 1) ? 2 : 1;
+                    saidaAtual.println("Letra não encontrada! Tentativas restantes: " + (this.getMaximoTentativas() - tentativas));
+                    //saidaAtual.println("Letras erradas: " + letrasErradas);
+                    
                 }
 
-                saidaAtual.println("Estado: " + mascara + ", Letras Erradas: " + letrasErradas);
-                saidaOutro.println("Estado: " + mascara + ", Letras Erradas: " + letrasErradas);
+                saidaAtual.println("Estado: " + mascara);
+                saidaOutro.println("Estado: " + mascara);
             
 
 
                 if (mascara.equals(palavra)){
-                    saidaAtual.println("Parabéns! Você acertou a palavra: " + palavra + "Fim de jogo");
-                    saidaOutro.println("Você perdeu! A palavra era: " + palavra + "Fim de jogo");
+                    saidaAtual.println("Parabéns! Você acertou a palavra: " + palavra);
+                    saidaAtual.println("Fim de jogo!");
+                    saidaOutro.println("Você perdeu! A palavra era: " + palavra);
+                    saidaOutro.println("Fim de jogo!");
                     break;
                 }
 
@@ -164,6 +167,10 @@ public class Servidor {
 
 
                 //limparTela();
+            } else if (mensagem.startsWith("Chat: ")){
+                String chat = mensagem.substring(6); // remove o termo "Chat: " da mensagem
+                saidaOutro.println("Chat do jogador: " + jogadorAtual + ": " + chat);
+            }
                 
         }
 

@@ -28,10 +28,15 @@ public class Cliente {
                 
                 System.out.println(mensagemServer);
                 if (mensagemServer.startsWith("Sua vez.")){
-                    System.out.println("Digite uma letra:");
-                    String tentativa = teclado.readLine();
-                    saida.println("Tentativa: " + tentativa);
-                    //limparTela();
+                    System.out.println("Digite uma letra ou envie uma mensagem de chat (Use 'Chat: ' antes da mensagem)");
+                    String mensagem = teclado.readLine();
+                    if (mensagem.startsWith("Chat: ")) {
+                        System.out.println();
+                        saida.println("Chat: " + mensagem);
+                        System.out.println();
+                    } else {
+                        saida.println("Tentativa: " + mensagem);
+                    }
                 }
 
                 if (mensagemServer.startsWith("Parabéns!")){
