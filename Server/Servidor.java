@@ -15,6 +15,8 @@ public class Servidor {
     private static final String[] palavrasDificeis = {"xenofobia", "inconstitucional", "paralelepipedo",
     "heterodoxo", "onomatopeia", "proparoxitona", "complexidade", "melancolia", "eclesiastico", "metamorfose",
     "tautologia" };
+
+    private static final String[] palavrasMedias = {"novembro", "palpite", "mistura", "quintal", "registro", "sujeito", "teclado"};
     private int maximasTentativas;
 
     public Servidor(int maximasTentativas){
@@ -24,9 +26,11 @@ public class Servidor {
     public Servidor(){}
 
     // usa true ou false
-    public boolean sortearDificuldade(){
+    public int sortearDificuldade(){
         Random aleatorio = new Random();
-        return aleatorio.nextBoolean();
+        int dificuldade = aleatorio.nextInt(3);
+        // f, m, d
+        return dificuldade;
     }
     
     public String escolherPalavra(String[] palavra) {
@@ -39,6 +43,12 @@ public class Servidor {
     public int sortearTentativaFacil(){
         Random random = new Random();
         this.maximasTentativas = random.nextInt(3) + 3;
+        return this.maximasTentativas;
+    }
+
+    public int sortearTentativaMedia(){
+        Random random = new Random();
+        this.maximasTentativas = random.nextInt(3) + 5;
         return this.maximasTentativas;
     }
 
@@ -77,12 +87,21 @@ public class Servidor {
         String palavra;
         String dificuldade;
 
-        if (sortearDificuldade()){ // se for dificil 
+        if (sortearDificuldade() == 2){ // se for dificil 
             palavra = escolherPalavra(palavrasDificeis);
             this.maximasTentativas = sortearTentativaDificil();
             dificuldade = "Dificil";
         }
         
+        else if (sortearDificuldade() == 1){ // se for médio
+            // palavra = escolherPalavra(palavras);
+            // this.maximasTentativas = sortearTentativaDificil();
+            // dificuldade = "Fácil";
+            palavra = escolherPalavra(palavrasMedias);
+            this.maximasTentativas = sortearTentativaMedia();
+            dificuldade = "Médio";
+        }
+
         else {
             palavra = escolherPalavra(palavras);
             this.maximasTentativas = sortearTentativaDificil();
@@ -210,7 +229,7 @@ public class Servidor {
     }
 
     public static void main(String[] args) throws IOException {
-        Servidor servidor = new Servidor(10);
+        Servidor servidor = new Servidor();
         servidor.iniciandoConexao();
     }
 }
