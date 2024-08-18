@@ -13,7 +13,8 @@ public class Cliente {
     }
     
     public static void main(String[] args) throws Exception {
-        try (Socket socket = new Socket("localhost", 8081)){
+        // stamos criando uma nova instância de Socket que tenta se conectar ao servidor que está rodando no localhost (127.0.0.1) na porta 8081
+        try (Socket socket = new Socket("localhost", 8081)){ // 8081 é a porta onde o servidor esta ouvindo
             // lê dados do fluxo de entrada do socket. Isso permite que o cliente receba mensagens do servidor.
             BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             // lê dados do fluxo de saída do socket. Isso permite que o cliente envie mensagens para o servidor.
@@ -26,11 +27,11 @@ public class Cliente {
         // enquanto a mensagem do servidor n for nula
             while ((mensagemServer = entrada.readLine()) != null){
                 
-                System.out.println(mensagemServer);
-                if (mensagemServer.startsWith("Sua vez.")){
+                System.out.println(mensagemServer); // recebe mensagem do servidor
+                if (mensagemServer.startsWith("Sua vez.")){ // se a mensagem do servidor começar com "Sua vez."
                     System.out.println("Digite uma letra ou envie uma mensagem de chat (Use 'Chat: ' antes da mensagem)");
                     String mensagem = teclado.readLine();
-                    if (mensagem.startsWith("Chat: ")) {
+                    if (mensagem.startsWith("Chat: ")) { 
                         System.out.println();
                         saida.println("Chat: " + mensagem);
                         System.out.println();

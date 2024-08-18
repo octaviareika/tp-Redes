@@ -42,13 +42,13 @@ public class Servidor {
 
     public int sortearTentativaFacil(){
         Random random = new Random();
-        this.maximasTentativas = random.nextInt(3) + 3;
+        this.maximasTentativas = random.nextInt(3) + 8;
         return this.maximasTentativas;
     }
 
     public int sortearTentativaMedia(){
         Random random = new Random();
-        this.maximasTentativas = random.nextInt(3) + 5;
+        this.maximasTentativas = random.nextInt(3) + 7;
         return this.maximasTentativas;
     }
 
@@ -178,7 +178,7 @@ public class Servidor {
 
                 if (tentativas >= this.getMaximoTentativas()){
                     saidaAtual.println("Você perdeu! A palavra era: " + palavra);
-                    saidaOutro.println("Parabéns! Você acertou a palavra: " + palavra);
+                    //saidaOutro.println("Parabéns! Você acertou a palavra: " + palavra);
                     break;
                 }
 

@@ -26,6 +26,8 @@ public class Client extends JFrame {
         chatArea.setEditable(false);
         chatInput = new JTextField(20);
 
+        
+
         JButton enviarLetra = new JButton("Enviar letra");
         enviarLetra.addActionListener(new ActionListener() {
             @Override
@@ -33,7 +35,11 @@ public class Client extends JFrame {
                 String letra = letraInput.getText();
                 if (!letra.isEmpty()) {
                     out.println("Tentativa: " + letra);
-                    letraInput.setText("");
+                    letraInput.setText(""); // faz ficar em branco dvnv
+                }
+
+                else {
+                    JOptionPane.showMessageDialog(null, "Digite uma letra para enviar.");
                 }
             }
         });
@@ -45,6 +51,10 @@ public class Client extends JFrame {
                 if (!chat.isEmpty()) {
                     out.println("Chat: " + chat);
                     chatInput.setText("");
+                }
+                
+                else {
+                    JOptionPane.showMessageDialog(null, "Digite uma mensagem para enviar.");
                 }
             }
         });

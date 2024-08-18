@@ -30,17 +30,32 @@ public class Server {
 
     public String escolherPalavra(String[] palavra) {
         // implementação
-        return palavra[0];
+        Random aleatorio = new Random();
+
+        int indiceAleaorio = aleatorio.nextInt(palavra.length);
+        return palavra[indiceAleaorio];
     }
 
     public int sortearTentativaFacil() {
-        // implementação
-        return 5;
+        
+        Random random = new Random();
+        this.maximasTentativas = random.nextInt(3) + 8;
+        return this.maximasTentativas;
     }
 
     public int sortearTentativaDificil() {
-        // implementação
-        return 3;
+        
+        Random random = new Random();
+        this.maximasTentativas = random.nextInt(3) + 6;
+        
+        return this.maximasTentativas;
+    }
+
+    public int sortearTentativaMedia() {
+        
+        Random random = new Random();
+        this.maximasTentativas = random.nextInt(3) + 7;
+        return this.maximasTentativas;
     }
 
     // getter
@@ -62,64 +77,81 @@ public class Server {
     }
 
     public void inicializarJogo(BufferedReader entradaJogador1, PrintWriter saidaJogador1, 
-                                BufferedReader entradaJogador2, PrintWriter saidaJogador2) throws IOException {
-        try (entradaJogador1; saidaJogador1; entradaJogador2; saidaJogador2) {
-            // implementação do jogo
-            String mensagem;
-            int jogadorAtual = 1;
-            int tentativas = 0;
-            String palavra = escolherPalavra(palavras);
-            String mascara = criarMascara(palavra);
+                            BufferedReader entradaJogador2, PrintWriter saidaJogador2) throws IOException {
+    try (entradaJogador1; saidaJogador1; entradaJogador2; saidaJogador2) {
+        // implementação do jogo
+        String mensagem;
+        int jogadorAtual = 1;
+        int tentativas = 0;
+        String palavra = escolherPalavra(palavras);
+        String mascara = criarMascara(palavra);
 
-            while ((mensagem = (jogadorAtual == 1 ? entradaJogador1 : entradaJogador2).readLine()) != null) {
-                PrintWriter saidaAtual = (jogadorAtual == 1 ? saidaJogador1 : saidaJogador2);
-                BufferedReader entradaAtual = (jogadorAtual == 1 ? entradaJogador1 : entradaJogador2);
-                PrintWriter saidaOutro = (jogadorAtual == 1 ? saidaJogador2 : saidaJogador1);
+        saidaJogador1.println("Bem-vindo ao jogo da forca! Primeiramente vez do Jogador 1");
+        saidaJogador1.println("Palavra: " + mascara);
+        saidaJogador1.println();
+        saidaJogador2.println("Bem-vindo ao jogo da forca!");
+        saidaJogador2.println("Palavra: " + mascara);
+        saidaJogador2.println();
 
-                // Situação atual
-                saidaAtual.println("Sua vez. Palavra: " + mascara);
+      //  mensagem = entradaJogador1.readLine();
+        while (!mascara.equals(palavra) && mascara != null && tentativas < this.getMaximoTentativas()) {
+            PrintWriter saidaAtual = (jogadorAtual == 1 ? saidaJogador1 : saidaJogador2);
+            BufferedReader entradaAtual = (jogadorAtual == 1 ? entradaJogador1 : entradaJogador2);
+            PrintWriter saidaOutro = (jogadorAtual == 1 ? saidaJogador2 : saidaJogador1);
 
-                System.out.println();
-                saidaAtual.println("Vez de jogador " + jogadorAtual);
-                saidaOutro.println("Aguarde a vez do jogador" + jogadorAtual);
-                System.out.println();
+            // Situação atual
+            saidaAtual.println("Sua vez. Palavra: " + mascara);
+            saidaOutro.println("Vez do jogador " + jogadorAtual);
+            saidaAtual.println("Vez de jogador " + jogadorAtual);
+            saidaOutro.println("Aguarde a vez do jogador " + jogadorAtual);
 
-                mensagem = entradaAtual.readLine();
-                if (mensagem.startsWith("Tentativa: ")) {
-                    String tentativa = mensagem.substring(11);
-                    tentativas++;
-                    if (palavra.contains(tentativa)) {
-                        // Atualiza a máscara
-                        for (int i = 0; i < palavra.length(); i++) {
-                            if (palavra.charAt(i) == tentativa.charAt(0)) {
-                                mascara = mascara.substring(0, i) + tentativa + mascara.substring(i + 1);
-                            }
+            mensagem = entradaAtual.readLine(); // le a mensagem do cliente
+            if (mensagem.startsWith("Tentativa: ")) { // se a mensagem do cliente começar com "Tentativa: "
+                String tentativa = mensagem.substring(11);
+                tentativas++;
+                if (palavra.contains(tentativa)) {
+                    // Atualiza a máscara
+                    for (int i = 0; i < palavra.length(); i++) {
+                        if (palavra.charAt(i) == tentativa.charAt(0)) {
+                            mascara = mascara.substring(0, i) + tentativa + mascara.substring(i + 1);
                         }
-                        saidaAtual.println("Acertou! " + mascara);
-                    } else {
-                        saidaAtual.println("Errou! " + mascara);
                     }
-
-                    if (mascara.equals(palavra)) {
-                        saidaAtual.println("Parabéns! Você acertou a palavra: " + palavra);
-                        saidaOutro.println("Fim de jogo!");
-                        break;
-                    }
-                    if (tentativas >= this.getMaximoTentativas()) {
-                        saidaAtual.println("Você perdeu! A palavra era: " + palavra);
-                        saidaOutro.println("Parabéns! Você acertou a palavra: " + palavra);
-                        break;
-                    }
-
-                    jogadorAtual = (jogadorAtual == 1) ? 2 : 1;
+                    saidaAtual.println("Acertou! " + mascara);
                     
-                } else if (mensagem.startsWith("Chat: ")) {
-                    String chat = mensagem.substring(6); // remove o termo "Chat: " da mensagem
-                    saidaOutro.println("Chat do jogador: " + jogadorAtual + ": " + chat);
+
+                } else {
+                    saidaAtual.println("Letra não encontrada! Tentativa restantes:  " + (this.getMaximoTentativas() - tentativas));
+                    
+
                 }
+
+                saidaAtual.println("Estado: " + mascara);
+                saidaOutro.println("Estado: " + mascara);
+
+                if (mascara.equals(palavra)) {
+                    saidaAtual.println("Parabéns! Você acertou a palavra: " + palavra);
+                    saidaOutro.println("Fim de jogo!");
+                    break;
+                }
+                if (tentativas >= this.getMaximoTentativas()) {
+                    saidaAtual.println("Você perdeu! A palavra era: " + palavra);
+                    saidaOutro.println("Fim de jogo!");
+                    break;
+                }
+
+                // Alterna o jogador atual
+                if (jogadorAtual == 1) {
+                    jogadorAtual = 2;
+                } else {
+                    jogadorAtual = 1;
+                }
+            } else if (mensagem.startsWith("Chat: ")) {
+                String chat = mensagem.substring(6); // remove o termo "Chat: " da mensagem
+                saidaOutro.println("Chat do jogador " + jogadorAtual + ": " + chat);
             }
         }
     }
+}
 
     public void iniciandoConexao() throws IOException {
         try (ServerSocket socket = new ServerSocket(porta)){
