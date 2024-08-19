@@ -9,6 +9,8 @@ public class Server {
     "tigre", "pato", "ganso", "galinha", "papagaio", "pomba", "coruja", "urubu", "pelicano", "avestruz",
     "geladeira", "fogao", "bandeira", "gravata", "camisa", "sapato", "lua", "planta", "arvore", "flor"};
 
+    private static final String[] palavrasMedias = {"novembro", "palpite", "mistura", "quintal", "registro", "sujeito", "teclado"};
+
     private static final String[] palavrasDificeis = {"xenofobia", "inconstitucional", "paralelepipedo",
     "heterodoxo", "onomatopeia", "proparoxitona", "complexidade", "melancolia", "eclesiastico", "metamorfose",
     "tautologia" };
@@ -19,13 +21,16 @@ public class Server {
     }
 
     public Server() {
-        this.maximasTentativas = 10; // valor padrão
+        //this.maximasTentativas = 10; // valor padrão
     }
 
     // usa true ou false
-    public boolean sortearDificuldade() {
-        // implementação
-        return true;
+    public int sortearDificuldade() {
+        // media, facil e  dificil
+        Random aleatorio = new Random();
+        int dificuldade = aleatorio.nextInt(3);
+        // f, m, d
+        return dificuldade;
     }
 
     public String escolherPalavra(String[] palavra) {
@@ -83,7 +88,31 @@ public class Server {
         String mensagem;
         int jogadorAtual = 1;
         int tentativas = 0;
-        String palavra = escolherPalavra(palavras);
+        //String palavra = escolherPalavra(palavras);
+        String palavra;
+        String dificuldade;
+
+        if (sortearDificuldade() == 2){ // se for dificil 
+            palavra = escolherPalavra(palavrasDificeis);
+            this.maximasTentativas = sortearTentativaDificil();
+            dificuldade = "Dificil";
+        }
+        
+        else if (sortearDificuldade() == 1){ // se for médio
+            // palavra = escolherPalavra(palavras);
+            // this.maximasTentativas = sortearTentativaDificil();
+            // dificuldade = "Fácil";
+            palavra = escolherPalavra(palavrasMedias);
+            this.maximasTentativas = sortearTentativaMedia();
+            dificuldade = "Médio";
+        }
+
+        else {
+            palavra = escolherPalavra(palavras);
+            this.maximasTentativas = sortearTentativaFacil();
+            dificuldade = "Fácil";
+        }
+        
         String mascara = criarMascara(palavra);
 
         saidaJogador1.println("Bem-vindo ao jogo da forca! Primeiramente vez do Jogador 1");
@@ -101,6 +130,7 @@ public class Server {
 
             // Situação atual
             saidaAtual.println("Sua vez. Palavra: " + mascara);
+            saidaAtual.println("Dificuldade: " + dificuldade);
             saidaOutro.println("Vez do jogador " + jogadorAtual);
             saidaAtual.println("Vez de jogador " + jogadorAtual);
             saidaOutro.println("Aguarde a vez do jogador " + jogadorAtual);

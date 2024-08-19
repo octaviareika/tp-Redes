@@ -104,7 +104,7 @@ public class Servidor {
 
         else {
             palavra = escolherPalavra(palavras);
-            this.maximasTentativas = sortearTentativaDificil();
+            this.maximasTentativas = sortearTentativaFacil();
             dificuldade = "Fácil";
         }
 
