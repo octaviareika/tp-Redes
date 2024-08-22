@@ -112,7 +112,7 @@ public class Server {
             this.maximasTentativas = sortearTentativaFacil();
             dificuldade = "Fácil";
         }
-        
+
         String mascara = criarMascara(palavra);
 
         saidaJogador1.println("Bem-vindo ao jogo da forca! Primeiramente vez do Jogador 1");
@@ -132,6 +132,7 @@ public class Server {
             saidaAtual.println("Sua vez. Palavra: " + mascara);
             saidaAtual.println("Dificuldade: " + dificuldade);
             saidaOutro.println("Vez do jogador " + jogadorAtual);
+            saidaAtual.println();
             saidaAtual.println("Vez de jogador " + jogadorAtual);
             saidaOutro.println("Aguarde a vez do jogador " + jogadorAtual);
 

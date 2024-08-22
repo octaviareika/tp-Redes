@@ -178,6 +178,7 @@ public class Servidor {
 
                 if (tentativas >= this.getMaximoTentativas()){
                     saidaAtual.println("Você perdeu! A palavra era: " + palavra);
+                    saidaOutro.println("Você perdeu! A palavra era: " + palavra);
                     //saidaOutro.println("Parabéns! Você acertou a palavra: " + palavra);
                     break;
                 }

@@ -115,9 +115,12 @@ public class Client extends JFrame {
 
     @Override
     public void dispose() {
-        out.println("Sair");
-        super.dispose();
+        int response = JOptionPane.showConfirmDialog(this, "Você realmente deseja sair?", "Sair", JOptionPane.YES_NO_OPTION);
 
+        if (response == JOptionPane.YES_OPTION){
+            out.println("Sair");
+            super.dispose();
+        }
         try {
             if (out != null) out.close();
             if (in != null) in.close();
