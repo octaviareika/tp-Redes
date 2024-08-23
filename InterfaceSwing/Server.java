@@ -14,6 +14,8 @@ public class Server {
     private static final String[] palavrasDificeis = {"xenofobia", "inconstitucional", "paralelepipedo",
     "heterodoxo", "onomatopeia", "proparoxitona", "complexidade", "melancolia", "eclesiastico", "metamorfose",
     "tautologia" };
+
+
     private int maximasTentativas;
 
     public Server(int maximasTentativas) {
@@ -91,6 +93,7 @@ public class Server {
         //String palavra = escolherPalavra(palavras);
         String palavra;
         String dificuldade;
+        StringBuilder letrasErradas = new StringBuilder();
 
         if (sortearDificuldade() == 2){ // se for dificil 
             palavra = escolherPalavra(palavrasDificeis);
@@ -139,6 +142,8 @@ public class Server {
             mensagem = entradaAtual.readLine(); // le a mensagem do cliente
             if (mensagem.startsWith("Tentativa: ")) { // se a mensagem do cliente começar com "Tentativa: "
                 String tentativa = mensagem.substring(11);
+                //StringBuilder letraErradaNova = new StringBuilder(letrasErradas);
+                
                 //tentativas++;
                 if (palavra.contains(tentativa)) {
                     // Atualiza a máscara
@@ -151,13 +156,19 @@ public class Server {
                     
 
                 } else {
-                    saidaAtual.println("Letra não encontrada!");
                     
+                    letrasErradas.append(tentativa).append(" ");
+                    saidaAtual.println("Letra não encontrada!");
+
 
                 }
 
+                // concatena a letra errada
+                
                 saidaAtual.println("Estado: " + mascara);
+                saidaAtual.println("Letras Erradas: " + letrasErradas.toString().toUpperCase());
                 saidaOutro.println("Estado: " + mascara);
+                saidaOutro.println("Letras Erradas: " + letrasErradas.toString().toUpperCase());
 
                 if (mascara.equals(palavra)) {
                     saidaAtual.println("Parabéns! Você acertou a palavra: " + palavra);
