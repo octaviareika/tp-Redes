@@ -94,9 +94,7 @@ public class Servidor {
         }
         
         else if (sortearDificuldade() == 1){ // se for médio
-            // palavra = escolherPalavra(palavras);
-            // this.maximasTentativas = sortearTentativaDificil();
-            // dificuldade = "Fácil";
+            
             palavra = escolherPalavra(palavrasMedias);
             this.maximasTentativas = sortearTentativaMedia();
             dificuldade = "Médio";

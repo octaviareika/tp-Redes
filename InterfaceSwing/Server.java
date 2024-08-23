@@ -87,7 +87,7 @@ public class Server {
         // implementação do jogo
         String mensagem;
         int jogadorAtual = 1;
-        int tentativas = 0;
+       // int tentativas = 0;
         //String palavra = escolherPalavra(palavras);
         String palavra;
         String dificuldade;
@@ -123,7 +123,7 @@ public class Server {
         saidaJogador2.println();
 
       //  mensagem = entradaJogador1.readLine();
-        while (!mascara.equals(palavra) && mascara != null && tentativas < this.getMaximoTentativas()) {
+        while (!mascara.equals(palavra) && mascara != null) {
             PrintWriter saidaAtual = (jogadorAtual == 1 ? saidaJogador1 : saidaJogador2);
             BufferedReader entradaAtual = (jogadorAtual == 1 ? entradaJogador1 : entradaJogador2);
             PrintWriter saidaOutro = (jogadorAtual == 1 ? saidaJogador2 : saidaJogador1);
@@ -139,7 +139,7 @@ public class Server {
             mensagem = entradaAtual.readLine(); // le a mensagem do cliente
             if (mensagem.startsWith("Tentativa: ")) { // se a mensagem do cliente começar com "Tentativa: "
                 String tentativa = mensagem.substring(11);
-                tentativas++;
+                //tentativas++;
                 if (palavra.contains(tentativa)) {
                     // Atualiza a máscara
                     for (int i = 0; i < palavra.length(); i++) {
@@ -151,7 +151,7 @@ public class Server {
                     
 
                 } else {
-                    saidaAtual.println("Letra não encontrada! Tentativa restantes:  " + (this.getMaximoTentativas() - tentativas));
+                    saidaAtual.println("Letra não encontrada!");
                     
 
                 }
@@ -161,14 +161,10 @@ public class Server {
 
                 if (mascara.equals(palavra)) {
                     saidaAtual.println("Parabéns! Você acertou a palavra: " + palavra);
-                    saidaOutro.println("Fim de jogo!");
+                    saidaOutro.println("Fim de jogo! Você perdeu! ");
                     break;
                 }
-                if (tentativas >= this.getMaximoTentativas()) {
-                    saidaAtual.println("Você perdeu! A palavra era: " + palavra);
-                    saidaOutro.println("Fim de jogo!");
-                    break;
-                }
+
 
                 // Alterna o jogador atual
                 if (jogadorAtual == 1) {
