@@ -2,6 +2,12 @@ package InterfaceSwing;
 import java.io.*;
 import java.net.*;
 import java.util.Random;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+
+import javax.swing.JOptionPane;
+import java.io.File;
 
 public class Server {
     private static final int porta = 8081;
@@ -17,6 +23,7 @@ public class Server {
 
 
     private int maximasTentativas;
+    private Clip clip;
 
     public Server(int maximasTentativas) {
         this.maximasTentativas = maximasTentativas;
@@ -24,6 +31,21 @@ public class Server {
 
     public Server() {
         //this.maximasTentativas = 10; // valor padrão
+    }
+
+    // tocar som
+    public void playSound(String filePath){
+        try {
+            if (clip != null && clip.isRunning()) {
+                return;
+            }
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filePath).getAbsoluteFile());
+            clip = AudioSystem.getClip();
+            clip.open(audioInputStream); // abre o arquivo de audio
+            clip.start();//começar
+        } catch (Exception e) {
+            System.out.println("Erro ao tocar o som: " + e.getMessage());
+        }
     }
 
     // usa true ou false
@@ -43,27 +65,27 @@ public class Server {
         return palavra[indiceAleaorio];
     }
 
-    public int sortearTentativaFacil() {
+    // public int sortearTentativaFacil() {
         
-        Random random = new Random();
-        this.maximasTentativas = random.nextInt(3) + 8;
-        return this.maximasTentativas;
-    }
+    //     Random random = new Random();
+    //     this.maximasTentativas = random.nextInt(3) + 8;
+    //     return this.maximasTentativas;
+    // }
 
-    public int sortearTentativaDificil() {
+    // public int sortearTentativaDificil() {
         
-        Random random = new Random();
-        this.maximasTentativas = random.nextInt(3) + 6;
+    //     Random random = new Random();
+    //     this.maximasTentativas = random.nextInt(3) + 6;
         
-        return this.maximasTentativas;
-    }
+    //     return this.maximasTentativas;
+    // }
 
-    public int sortearTentativaMedia() {
+    // public int sortearTentativaMedia() {
         
-        Random random = new Random();
-        this.maximasTentativas = random.nextInt(3) + 7;
-        return this.maximasTentativas;
-    }
+    //     Random random = new Random();
+    //     this.maximasTentativas = random.nextInt(3) + 7;
+    //     return this.maximasTentativas;
+    // }
 
     // getter
     public int getMaximoTentativas() {
@@ -89,53 +111,56 @@ public class Server {
         // implementação do jogo
         String mensagem;
         int jogadorAtual = 1;
-       // int tentativas = 0;
-        //String palavra = escolherPalavra(palavras);
+       
         String palavra;
         String dificuldade;
         StringBuilder letrasErradas = new StringBuilder();
 
         if (sortearDificuldade() == 2){ // se for dificil 
             palavra = escolherPalavra(palavrasDificeis);
-            this.maximasTentativas = sortearTentativaDificil();
+           // this.maximasTentativas = sortearTentativaDificil();
             dificuldade = "Dificil";
         }
         
         else if (sortearDificuldade() == 1){ // se for médio
-            // palavra = escolherPalavra(palavras);
-            // this.maximasTentativas = sortearTentativaDificil();
-            // dificuldade = "Fácil";
+        
             palavra = escolherPalavra(palavrasMedias);
-            this.maximasTentativas = sortearTentativaMedia();
+           // this.maximasTentativas = sortearTentativaMedia();
             dificuldade = "Médio";
         }
 
         else {
             palavra = escolherPalavra(palavras);
-            this.maximasTentativas = sortearTentativaFacil();
+            //this.maximasTentativas = sortearTentativaFacil();
             dificuldade = "Fácil";
         }
 
         String mascara = criarMascara(palavra);
 
-        saidaJogador1.println("Bem-vindo ao jogo da forca! Primeiramente vez do Jogador 1");
+        saidaJogador1.println("Bem-vindo ao jogo da forca! Primeiramente vez do Jogador 1 (Você)");
         saidaJogador1.println("Palavra: " + mascara);
+        saidaJogador1.println("Dificuldade: " + dificuldade);
         saidaJogador1.println();
         saidaJogador2.println("Bem-vindo ao jogo da forca!");
         saidaJogador2.println("Palavra: " + mascara);
+        saidaJogador2.println("Dificuldade: " + dificuldade);
         saidaJogador2.println();
 
       //  mensagem = entradaJogador1.readLine();
         while (!mascara.equals(palavra) && mascara != null) {
+            playSound("musicas/musiquinha.wav");
+
             PrintWriter saidaAtual = (jogadorAtual == 1 ? saidaJogador1 : saidaJogador2);
             BufferedReader entradaAtual = (jogadorAtual == 1 ? entradaJogador1 : entradaJogador2);
             PrintWriter saidaOutro = (jogadorAtual == 1 ? saidaJogador2 : saidaJogador1);
 
             // Situação atual
             saidaAtual.println("Sua vez. Palavra: " + mascara);
-            saidaAtual.println("Dificuldade: " + dificuldade);
+            saidaAtual.println();
+            saidaOutro.println();
             saidaOutro.println("Vez do jogador " + jogadorAtual);
             saidaAtual.println();
+            saidaOutro.println();
             saidaAtual.println("Vez de jogador " + jogadorAtual);
             saidaOutro.println("Aguarde a vez do jogador " + jogadorAtual);
 
@@ -171,7 +196,9 @@ public class Server {
                 saidaOutro.println("Letras Erradas: " + letrasErradas.toString().toUpperCase());
 
                 if (mascara.equals(palavra)) {
-                    saidaAtual.println("Parabéns! Você acertou a palavra: " + palavra);
+                    playSound("musicas/vitoria.wav");
+                    JOptionPane.showMessageDialog(null, "Parabéns, jogador: " + jogadorAtual + "!Você acertou a palavra: " + palavra);
+                    
                     saidaOutro.println("Fim de jogo! Você perdeu! ");
                     break;
                 }
@@ -190,6 +217,7 @@ public class Server {
         }
     }
 }
+
 
     public void iniciandoConexao() throws IOException {
         try (ServerSocket socket = new ServerSocket(porta)){

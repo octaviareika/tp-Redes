@@ -2,6 +2,10 @@ package Server;
 import java.io.*;
 import java.net.*;
 import java.util.Random;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import java.io.File;
 //import java.util.Scanner;
 
 // Jogo da Forca
@@ -24,6 +28,17 @@ public class Servidor {
     }
 
     public Servidor(){}
+
+    public static void playSound(String filePath){
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filePath).getAbsoluteFile());
+            Clip clip = AudioSystem.getClip(); // cria um clip de audio, o que significa que ele pode ser tocado
+            clip.open(audioInputStream); // abre o arquivo de audio
+            clip.start();//começar
+        } catch (Exception e) {
+            System.out.println("Erro ao tocar o som: " + e.getMessage());
+        }
+    }
 
     // usa true ou false
     public int sortearDificuldade(){
@@ -167,7 +182,7 @@ public class Servidor {
 
 
                 if (mascara.equals(palavra)){
-                    saidaAtual.println("Parabéns! Você acertou a palavra: " + palavra);
+                    saidaAtual.println("Parabéns, Você acertou a palavra: " + palavra);
                     saidaAtual.println("Fim de jogo!");
                     saidaOutro.println("Você perdeu! A palavra era: " + palavra);
                     saidaOutro.println("Fim de jogo!");
