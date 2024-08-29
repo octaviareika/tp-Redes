@@ -7,7 +7,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
 import javax.swing.JOptionPane;
-import java.io.File;
 
 public class Server {
     private static final int porta = 8081;
@@ -195,13 +194,15 @@ public class Server {
                 saidaOutro.println("Estado: " + mascara);
                 saidaOutro.println("Letras Erradas: " + letrasErradas.toString().toUpperCase());
 
-                if (mascara.equals(palavra)) {
-                    playSound("musicas/vitoria.wav");
-                    JOptionPane.showMessageDialog(null, "Parabéns, jogador: " + jogadorAtual + "!Você acertou a palavra: " + palavra);
+                // if (mascara.equals(palavra)) {
+                //     playSound("musicas/vitoria.wav");
+                //     JOptionPane.showMessageDialog(null, "Parabéns, jogador: " + jogadorAtual + "!Você acertou a palavra: " + palavra);
                     
-                    saidaOutro.println("Fim de jogo! Você perdeu! ");
-                    break;
-                }
+                //     saidaOutro.println("Fim de jogo! Você perdeu! ");
+                //     break;
+                // }
+
+                verificarVitoria(palavra, mascara, saidaAtual, entradaAtual, saidaOutro, jogadorAtual);
 
 
                 // Alterna o jogador atual
@@ -218,6 +219,18 @@ public class Server {
     }
 }
 
+public void verificarVitoria(String palavra, String mascara, PrintWriter saidaAtual, 
+    BufferedReader entradaAtual, PrintWriter saidaOutro, int jogadorAtual) {
+
+    if (mascara.equals(palavra)) {
+        playSound("musicas/vitoria.wav");
+        JOptionPane.showMessageDialog(null, "Parabéns, jogador: " + jogadorAtual + "! Você acertou a palavra: " + palavra);
+        
+        saidaOutro.println("Fim de jogo! Você perdeu! ");
+    }
+    
+
+}
 
     public void iniciandoConexao() throws IOException {
         try (ServerSocket socket = new ServerSocket(porta)){
