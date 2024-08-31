@@ -1,10 +1,14 @@
 package InterfaceSwing;
 
-import java.io.*;
-import java.net.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 
 public class Client extends JFrame {
     JTextField letraInput;
@@ -17,17 +21,12 @@ public class Client extends JFrame {
 
     public Client() {
         setTitle("Jogo da Forca");
-        setSize(600, 400);
+        setSize(1000, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // fecha a janela
 
+        // Painel de tentativas (jogo)
         estadoLabel = new JLabel("Estado: ");
         letraInput = new JTextField(10);
-        chatArea = new JTextArea(10, 30);
-        chatArea.setEditable(false);
-        chatInput = new JTextField(20);
-
-        
-
         JButton enviarLetra = new JButton("Enviar letra");
         enviarLetra.addActionListener(new ActionListener() {
             @Override
@@ -36,14 +35,25 @@ public class Client extends JFrame {
                 if (!letra.isEmpty()) {
                     out.println("Tentativa: " + letra);
                     letraInput.setText(""); // faz ficar em branco dvnv
-                }
-
-                else {
+                } else {
                     JOptionPane.showMessageDialog(null, "Digite uma letra para enviar.");
                 }
             }
         });
 
+        JPanel jogoPanel = new JPanel();
+        jogoPanel.setLayout(new BorderLayout());
+        JPanel topPanel = new JPanel();
+        topPanel.add(estadoLabel);
+        topPanel.add(new JLabel("Letra:"));
+        topPanel.add(letraInput);
+        topPanel.add(enviarLetra);
+        jogoPanel.add(topPanel, BorderLayout.NORTH);
+
+        // Painel de chat
+        chatArea = new JTextArea(20, 30);
+        chatArea.setEditable(false);
+        chatInput = new JTextField(20);
         JButton enviarChatButton = new JButton("Enviar Chat");
         enviarChatButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -51,22 +61,11 @@ public class Client extends JFrame {
                 if (!chat.isEmpty()) {
                     out.println("Chat: " + chat);
                     chatInput.setText("");
-                }
-                
-                else {
+                } else {
                     JOptionPane.showMessageDialog(null, "Digite uma mensagem para enviar.");
                 }
             }
         });
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-
-        JPanel topPanel = new JPanel();
-        topPanel.add(estadoLabel);
-        topPanel.add(new JLabel("Letra:"));
-        topPanel.add(letraInput);
-        topPanel.add(enviarLetra);
 
         JPanel chatPanel = new JPanel();
         chatPanel.setLayout(new BorderLayout());
@@ -76,12 +75,13 @@ public class Client extends JFrame {
         chatInputPanel.add(new JLabel("Chat:"));
         chatInputPanel.add(chatInput);
         chatInputPanel.add(enviarChatButton);
+        chatPanel.add(chatInputPanel, BorderLayout.SOUTH);
 
-        panel.add(topPanel, BorderLayout.NORTH);
-        panel.add(chatPanel, BorderLayout.CENTER);
-        panel.add(chatInputPanel, BorderLayout.SOUTH);
+        // Dividir a interface em duas partes
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, jogoPanel, chatPanel);
+        splitPane.setDividerLocation(400); // Define a posição inicial do divisor
 
-        add(panel);
+        add(splitPane);
 
         try {
             socket = new Socket("localhost", 8081); // socket do cliente conecta-se com o servidor
