@@ -1,6 +1,7 @@
 package InterfaceSwing;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,14 +21,35 @@ public class Client extends JFrame {
     private Socket socket;
 
     public Client() {
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            // Caso o Nimbus não esteja disponível, usa o padrão do sistema.
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
         setTitle("Jogo da Forca");
         setSize(1000, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // fecha a janela
 
+        // Definir um tema moderno
+        
+
         // Painel de tentativas (jogo)
         estadoLabel = new JLabel("Estado: ");
+        estadoLabel.setFont(new Font("Arial", Font.BOLD, 16));
         letraInput = new JTextField(10);
         JButton enviarLetra = new JButton("Enviar letra");
+        enviarLetra.setFont(new Font("Arial", Font.PLAIN, 14));
         enviarLetra.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -43,23 +65,30 @@ public class Client extends JFrame {
 
         JPanel jogoPanel = new JPanel();
         jogoPanel.setLayout(new BorderLayout());
+        jogoPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); // margem
         JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.add(estadoLabel);
-        topPanel.add(new JLabel("Letra:"));
-        topPanel.add(letraInput);
-        topPanel.add(enviarLetra);
+        JPanel letraPanel = new JPanel();
+        letraPanel.add(new JLabel("Letra:"));
+        letraPanel.add(letraInput);
+        letraPanel.add(enviarLetra);
+        topPanel.add(letraPanel);
         jogoPanel.add(topPanel, BorderLayout.NORTH);
 
         // Painel de chat
         chatArea = new JTextArea(20, 30);
         chatArea.setEditable(false);
+        chatArea.setFont(new Font("Arial", Font.PLAIN, 14));
         chatInput = new JTextField(20);
         JButton enviarChatButton = new JButton("Enviar Chat");
+        enviarChatButton.setFont(new Font("Arial", Font.PLAIN, 14));
         enviarChatButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String chat = chatInput.getText().trim();
                 if (!chat.isEmpty()) {
                     out.println("Chat: " + chat);
+                    chatArea.append("Você: " + chat + "\n");
                     chatInput.setText("");
                 } else {
                     JOptionPane.showMessageDialog(null, "Digite uma mensagem para enviar.");
@@ -69,6 +98,7 @@ public class Client extends JFrame {
 
         JPanel chatPanel = new JPanel();
         chatPanel.setLayout(new BorderLayout());
+        chatPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         chatPanel.add(new JScrollPane(chatArea), BorderLayout.CENTER);
 
         JPanel chatInputPanel = new JPanel();
@@ -79,7 +109,7 @@ public class Client extends JFrame {
 
         // Dividir a interface em duas partes
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, jogoPanel, chatPanel);
-        splitPane.setDividerLocation(400); // Define a posição inicial do divisor
+        splitPane.setDividerLocation(500); // Define a posição inicial do divisor
 
         add(splitPane);
 
@@ -87,6 +117,26 @@ public class Client extends JFrame {
             socket = new Socket("localhost", 8081); // socket do cliente conecta-se com o servidor
             out = new PrintWriter(socket.getOutputStream(), true); // envia mensagens para o servidor
             in = new BufferedReader(new InputStreamReader(socket.getInputStream())); // recebe mensagens do servidor
+
+
+            String[] opcoes = {"Fácil", "Médio", "Difícil"};
+            String dificuldade = (String) JOptionPane.showInputDialog(
+                    this,
+                    "Escolha a dificuldade:",
+                    "Seleção de Dificuldade",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    opcoes,
+                    opcoes[0]
+            );
+
+            if (dificuldade != null) {
+                out.println("Dificuldade: " + dificuldade); // envia a dificuldade escolhida para o servidor
+            } else {
+                JOptionPane.showMessageDialog(this, "Nenhuma dificuldade selecionada. O jogo será encerrado.");
+                dispose();
+                return;
+            }
 
             new Thread(new Runnable() { // o que essa thread faz? ela fica lendo as mensagens do servidor
                 public void run() {
