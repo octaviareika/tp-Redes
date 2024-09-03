@@ -70,6 +70,25 @@ public class Server {
         return maximasTentativas;
     }
 
+    public int sortearTentativaFacil(){
+        Random random = new Random();
+        this.maximasTentativas = random.nextInt(3) + 5;
+        return this.maximasTentativas;
+    }
+
+    public int sortearTentativaMedia(){
+        Random random = new Random();
+        this.maximasTentativas = random.nextInt(3) + 12;
+        return this.maximasTentativas;
+    }
+
+    public int sortearTentativaDificil(){
+        Random random = new Random();
+        this.maximasTentativas = random.nextInt(3) + 10;
+        return this.maximasTentativas;
+        
+    }
+
     // criar uma mascara para a palavra
     public String criarMascara(String palavra) {
         StringBuilder mascara = new StringBuilder();
@@ -91,6 +110,7 @@ public class Server {
             int jogadorAtual = 1;
             String palavra = null;
             String dificuldade = null;
+            int tentativas = 0;
             StringBuilder letrasErradas = new StringBuilder();
 
             while ((mensagem = entradaJogador1.readLine()) != null) {
@@ -104,12 +124,15 @@ public class Server {
                 switch (dificuldade) {
                     case "Difícil":
                         palavra = escolherPalavra(palavrasDificeis);
+                        tentativas = sortearTentativaDificil();
                         break;
                     case "Médio":
                         palavra = escolherPalavra(palavrasMedias);
+                        tentativas = sortearTentativaMedia();
                         break;
                     case "Fácil":
                         palavra = escolherPalavra(palavras);
+                        tentativas = sortearTentativaFacil();
                         break;
                 }
             }
@@ -119,24 +142,24 @@ public class Server {
             saidaJogador1.println("Bem-vindo ao jogo da forca! Primeiramente vez do Jogador 1 (Você)");
             saidaJogador1.println("Palavra: " + mascara);
             saidaJogador1.println("Dificuldade: " + dificuldade);
+            saidaJogador1.println("Tentativas: " + tentativas);
             saidaJogador1.println();
             saidaJogador2.println("Bem-vindo ao jogo da forca!");
             saidaJogador2.println("Palavra: " + mascara);
             saidaJogador2.println("Dificuldade: " + dificuldade);
             saidaJogador2.println();
 
-            while (!mascara.equals(palavra) && mascara != null) {
-                PrintWriter saidaAtual = (jogadorAtual == 1 ? saidaJogador1 : saidaJogador2);
-                BufferedReader entradaAtual = (jogadorAtual == 1 ? entradaJogador1 : entradaJogador2);
-                PrintWriter saidaOutro = (jogadorAtual == 1 ? saidaJogador2 : saidaJogador1);
-
+            while (!mascara.equals(palavra) && mascara != null && tentativas > 0) {
+                PrintWriter saidaAtual = (jogadorAtual == 1 ? saidaJogador1 : saidaJogador2); // PrintWriter serve para enviar mensagens para o cliente
+                BufferedReader entradaAtual = (jogadorAtual == 1 ? entradaJogador1 : entradaJogador2); // BufferedReader serve para receber ou ler mensagens do cliente
+                PrintWriter saidaOutro = (jogadorAtual == 1 ? saidaJogador2 : saidaJogador1); // PrintWriter serve para enviar mensagens para o cliente mas é o outro jogador
                 // Situação atual
-                saidaAtual.println("Sua vez. Palavra: " + mascara);
+                
                 saidaAtual.println();
                 saidaOutro.println();
                 saidaAtual.println();
                 saidaOutro.println();
-                saidaAtual.println("Vez de jogador (Você) " + jogadorAtual);
+                saidaAtual.println("Vez de jogador " + jogadorAtual + "(Você)");
                 saidaOutro.println("Aguarde a vez do jogador " + jogadorAtual);
 
                 mensagem = entradaAtual.readLine(); // le a mensagem do cliente
@@ -146,7 +169,9 @@ public class Server {
 
                     if (letrasTentadas.contains(letraTentada)) {
                         playSound("musicas/letraErrada.wav");
-                        saidaAtual.println("Letra já digitada! ");
+                        tentativas--;
+                        saidaAtual.println("Letra já digitada! Tentativas: " + tentativas);
+
                     } else {
                         letrasTentadas.add(letraTentada);
                         if (palavra.contains(tentativa)) {
@@ -161,7 +186,9 @@ public class Server {
                         } else {
                             playSound("musicas/letraErrada.wav");
                             letrasErradas.append(letraTentada).append(" ");
-                            saidaAtual.println("Letra não encontrada!");
+                            tentativas--;
+                            saidaAtual.println("Letra não encontrada! Tentativas: " + tentativas);
+
                         }
                     }
 
@@ -170,7 +197,7 @@ public class Server {
                     saidaOutro.println("Estado: " + mascara);
                     saidaOutro.println("Letras Erradas: " + letrasErradas.toString().toUpperCase());
 
-                    verificarVitoria(palavra, mascara, saidaAtual, entradaAtual, saidaOutro, jogadorAtual);
+                    verificarVitoria(palavra, mascara, saidaAtual, entradaAtual, saidaOutro, jogadorAtual, tentativas);
 
                     // Alterna o jogador atual
                     if (jogadorAtual == 1) {
@@ -180,20 +207,30 @@ public class Server {
                     }
                 } else if (mensagem.startsWith("Chat: ")) {
                     String chat = mensagem.substring(6); // remove o termo "Chat: " da mensagem
-                    saidaOutro.println("Chat do jogador " + jogadorAtual + ": " + chat);
+                    saidaOutro.println("Chat do jogador " + jogadorAtual + ": " + chat); // vai aparecer para outro jogador
                 }
             }
         }
     }
 
     public void verificarVitoria(String palavra, String mascara, PrintWriter saidaAtual, 
-        BufferedReader entradaAtual, PrintWriter saidaOutro, int jogadorAtual) {
-        if (mascara.equals(palavra)) {
+        BufferedReader entradaAtual, PrintWriter saidaOutro, int jogadorAtual, int tentativas) throws IOException {
+        if (mascara.equals(palavra) && tentativas > 0) {
             playSound("musicas/vitoria.wav");
             JOptionPane.showMessageDialog(null, "Parabéns, jogador: " + jogadorAtual + " ! Você acertou a palavra: " + palavra);
             saidaAtual.println("Fim de jogo! Você venceu! ");
             saidaOutro.println("Fim de jogo! Você perdeu! ");
             playSound("musicas/jogoPerdido.wav");
+        }
+
+        // se nenhum dos jogadores acertar a palavra
+
+        if (tentativas <= 0) {
+            playSound("musicas/jogoPerdido.wav");
+            saidaAtual.println("Você perdeu! A palavra era: " + palavra);
+            saidaOutro.println("Você perdeu! A palavra era: " + palavra);
+            saidaAtual.println("Fim de jogo!");
+            saidaOutro.println("Fim de jogo!");
         }
     }
 

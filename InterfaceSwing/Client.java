@@ -127,7 +127,7 @@ public class Client extends JFrame {
                     JOptionPane.PLAIN_MESSAGE,
                     null,
                     opcoes,
-                    opcoes[0]
+                    opcoes[0]   
             );
 
             if (dificuldade != null) {
@@ -138,15 +138,15 @@ public class Client extends JFrame {
                 return;
             }
 
-            new Thread(new Runnable() { // o que essa thread faz? ela fica lendo as mensagens do servidor
+            new Thread(new Runnable() { // thread fica lendo as mensagens do servidor
                 public void run() {
                     try {
                         String message;
                         while ((message = in.readLine()) != null) {
-                            if (message.startsWith("Estado: ")) {
-                                estadoLabel.setText(message);
+                            if (message.startsWith("Estado: ")) { // se a mensagem que veio do servidor começa com Estado:
+                                estadoLabel.setText(message); 
                             } else if (message.startsWith("Chat: ")) {
-                                chatArea.append(message.substring(6) + "\n");
+                                chatArea.append(message.substring(6) + "\n"); // pega a mensagem que o cliente digita e coloca para aparecer na tela
                             } else {
                                 chatArea.append(message + "\n");
                             }
