@@ -2,6 +2,7 @@ package InterfaceSwing;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,7 +14,7 @@ import java.net.Socket;
 
 public class Client extends JFrame {
     JTextField letraInput;
-    private JTextArea chatArea;
+    private JTextPane chatPane;
     private JTextField chatInput;
     private JLabel estadoLabel;
     private PrintWriter out;
@@ -41,9 +42,6 @@ public class Client extends JFrame {
         setSize(1000, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // fecha a janela
 
-        // Definir um tema moderno
-        
-
         // Painel de tentativas (jogo)
         estadoLabel = new JLabel("Estado: ");
         estadoLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -55,7 +53,7 @@ public class Client extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String letra = letraInput.getText();
                 if (!letra.isEmpty()) {
-                    out.println("Tentativa: " + letra);
+                    out.println("Tentativa: " + letra); // envia a letra para o servidor
                     letraInput.setText(""); // faz ficar em branco dvnv
                 } else {
                     JOptionPane.showMessageDialog(null, "Digite uma letra para enviar.");
@@ -77,18 +75,32 @@ public class Client extends JFrame {
         jogoPanel.add(topPanel, BorderLayout.NORTH);
 
         // Painel de chat
-        chatArea = new JTextArea(20, 30);
-        chatArea.setEditable(false);
-        chatArea.setFont(new Font("Arial", Font.PLAIN, 14));
+        chatPane = new JTextPane();
+        chatPane.setEditable(false);
+        StyledDocument doc = chatPane.getStyledDocument();
+
+        // Definir estilos
+        Style estiloNegrito = chatPane.addStyle("Negrito", null);
+        StyleConstants.setBold(estiloNegrito, true);
+
+        Style estiloNormal = chatPane.addStyle("Normal", null);
+        StyleConstants.setBold(estiloNormal, false);
+
         chatInput = new JTextField(20);
         JButton enviarChatButton = new JButton("Enviar Chat");
         enviarChatButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        enviarChatButton.setForeground(Color.RED);
         enviarChatButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String chat = chatInput.getText().trim();
                 if (!chat.isEmpty()) {
+                    try {
+                        doc.insertString(doc.getLength(), "Você: ", estiloNegrito);
+                        doc.insertString(doc.getLength(), chat + "\n", estiloNormal);
+                    } catch (BadLocationException ex) {
+                        ex.printStackTrace();
+                    }
                     out.println("Chat: " + chat);
-                    chatArea.append("Você: " + chat + "\n");
                     chatInput.setText("");
                 } else {
                     JOptionPane.showMessageDialog(null, "Digite uma mensagem para enviar.");
@@ -99,7 +111,7 @@ public class Client extends JFrame {
         JPanel chatPanel = new JPanel();
         chatPanel.setLayout(new BorderLayout());
         chatPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        chatPanel.add(new JScrollPane(chatArea), BorderLayout.CENTER);
+        chatPanel.add(new JScrollPane(chatPane), BorderLayout.CENTER);
 
         JPanel chatInputPanel = new JPanel();
         chatInputPanel.add(new JLabel("Chat:"));
@@ -118,7 +130,6 @@ public class Client extends JFrame {
             out = new PrintWriter(socket.getOutputStream(), true); // envia mensagens para o servidor
             in = new BufferedReader(new InputStreamReader(socket.getInputStream())); // recebe mensagens do servidor
 
-
             String[] opcoes = {"Fácil", "Médio", "Difícil"};
             String dificuldade = (String) JOptionPane.showInputDialog(
                     this,
@@ -127,7 +138,7 @@ public class Client extends JFrame {
                     JOptionPane.PLAIN_MESSAGE,
                     null,
                     opcoes,
-                    opcoes[0]   
+                    opcoes[0]
             );
 
             if (dificuldade != null) {
@@ -144,11 +155,19 @@ public class Client extends JFrame {
                         String message;
                         while ((message = in.readLine()) != null) {
                             if (message.startsWith("Estado: ")) { // se a mensagem que veio do servidor começa com Estado:
-                                estadoLabel.setText(message); 
+                                estadoLabel.setText(message);
                             } else if (message.startsWith("Chat: ")) {
-                                chatArea.append(message.substring(6) + "\n"); // pega a mensagem que o cliente digita e coloca para aparecer na tela
+                                try {
+                                    doc.insertString(doc.getLength(), message.substring(6) + "\n", estiloNormal);
+                                } catch (BadLocationException ex) {
+                                    ex.printStackTrace();
+                                }
                             } else {
-                                chatArea.append(message + "\n");
+                                try {
+                                    doc.insertString(doc.getLength(), message + "\n", estiloNormal);
+                                } catch (BadLocationException ex) {
+                                    ex.printStackTrace();
+                                }
                             }
                         }
                     } catch (IOException e) {
@@ -170,6 +189,7 @@ public class Client extends JFrame {
         if (response == JOptionPane.YES_OPTION){
             out.println("Sair");
             super.dispose();
+            System.exit(0);
         }
         try {
             if (out != null) out.close();

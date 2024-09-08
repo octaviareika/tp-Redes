@@ -72,7 +72,7 @@ public class Server {
 
     public int sortearTentativaFacil(){
         Random random = new Random();
-        this.maximasTentativas = random.nextInt(3) + 5;
+        this.maximasTentativas = random.nextInt(3) + 16;
         return this.maximasTentativas;
     }
 
@@ -138,8 +138,9 @@ public class Server {
             }
 
             String mascara = criarMascara(palavra);
+            System.out.println(palavra);
 
-            saidaJogador1.println("Bem-vindo ao jogo da forca! Primeiramente vez do Jogador 1 (Você)");
+            saidaJogador1.println("Bem-vindo ao jogo da forca! Primeiramente, vez do Jogador 1 (Você)");
             saidaJogador1.println("Palavra: " + mascara);
             saidaJogador1.println("Dificuldade: " + dificuldade);
             saidaJogador1.println("Tentativas: " + tentativas);
@@ -147,6 +148,7 @@ public class Server {
             saidaJogador2.println("Bem-vindo ao jogo da forca!");
             saidaJogador2.println("Palavra: " + mascara);
             saidaJogador2.println("Dificuldade: " + dificuldade);
+            saidaJogador2.println("Tentativas: " + tentativas);
             saidaJogador2.println();
 
             while (!mascara.equals(palavra) && mascara != null && tentativas > 0) {
@@ -159,8 +161,10 @@ public class Server {
                 saidaOutro.println();
                 saidaAtual.println();
                 saidaOutro.println();
-                saidaAtual.println("Vez de jogador " + jogadorAtual + "(Você)");
+                saidaAtual.println("-------------------------------------------");
+                saidaAtual.println("Vez de jogador " + jogadorAtual + " (Você)");
                 saidaOutro.println("Aguarde a vez do jogador " + jogadorAtual);
+
 
                 mensagem = entradaAtual.readLine(); // le a mensagem do cliente
                 if (mensagem.startsWith("Tentativa: ")) { // se a mensagem do cliente começar com "Tentativa: "
@@ -183,6 +187,7 @@ public class Server {
                             }
                             playSound("musicas/acertaPalavra.wav");
                             saidaAtual.println("Acertou! " + mascara);
+                            saidaAtual.println("-------------------------------------------");
                         } else {
                             playSound("musicas/letraErrada.wav");
                             letrasErradas.append(letraTentada).append(" ");
@@ -196,6 +201,8 @@ public class Server {
                     saidaAtual.println("Letras Erradas: " + letrasErradas.toString().toUpperCase());
                     saidaOutro.println("Estado: " + mascara);
                     saidaOutro.println("Letras Erradas: " + letrasErradas.toString().toUpperCase());
+                    saidaAtual.println("-------------------------------------------");
+
 
                     verificarVitoria(palavra, mascara, saidaAtual, entradaAtual, saidaOutro, jogadorAtual, tentativas);
 
@@ -220,7 +227,7 @@ public class Server {
             JOptionPane.showMessageDialog(null, "Parabéns, jogador: " + jogadorAtual + " ! Você acertou a palavra: " + palavra);
             saidaAtual.println("Fim de jogo! Você venceu! ");
             saidaOutro.println("Fim de jogo! Você perdeu! ");
-            playSound("musicas/jogoPerdido.wav");
+           // playSound("musicas/jogoPerdido.wav");
         }
 
         // se nenhum dos jogadores acertar a palavra
