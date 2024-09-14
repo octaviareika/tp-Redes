@@ -8,6 +8,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.JOptionPane;
+import javax.swing.*;;
 
 public class Server {
     private static final int porta = 8081;
@@ -25,6 +26,10 @@ public class Server {
     private Clip clip;
     private Set<Character> letrasTentadas; /// caractere
 
+    JLabel imagemLabel;
+    private ImageIcon[] imagens = new ImageIcon[11];
+    int erros =0;
+
     public Server(int maximasTentativas) {
         this.maximasTentativas = maximasTentativas;
         this.letrasTentadas = new HashSet<>();
@@ -32,6 +37,77 @@ public class Server {
 
     public Server() {
         this.letrasTentadas = new HashSet<>();
+        this.imagemLabel = new JLabel();
+        // ajustar tamanho
+        imagemLabel.setBounds(10, 10, 300, 300);
+    }
+
+    // atualizar imagem
+    public void atualizarImagem() {
+        
+        imagens[0] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/forca.png"));
+        imagens[1] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/cabeca.png"));
+        imagens[2] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/pescoco.png"));
+        imagens[3] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/corpo.png"));
+        imagens[4] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/braco1.png"));
+        imagens[5] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/braco2.png"));
+        imagens[6] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/perna1.png"));
+        imagens[7] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/perna2.png"));
+        imagens[8] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/olho1.png"));
+        imagens[9] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/olho2.png"));
+        imagens[10] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/boca.png"));
+
+
+    }
+
+    public void adicionarErro(PrintWriter saidaAtual, PrintWriter saidaOutro) {
+        erros++;
+        String imagePath = "";
+        switch (erros) {
+            case 1:
+                imagePath = "/InterfaceSwing/Imagens/cabeca.png";
+                imagens[1] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/cabeca.png"));
+                break;
+            case 2:
+                imagePath = "/InterfaceSwing/Imagens/pescoco.png";
+                imagens[2] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/pescoco.png"));
+                break;
+            case 3:
+                imagePath = "/InterfaceSwing/Imagens/corpo.png";
+                imagens[3] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/corpo.png"));
+                break;
+            case 4:
+                imagePath = "/InterfaceSwing/Imagens/braco1.png";
+                imagens[4] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/braco1.png"));
+                break;
+            case 5:
+                imagePath = "/InterfaceSwing/Imagens/braco2.png";
+                imagens[5] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/braco2.png"));
+                break;
+            case 6:
+                imagePath = "/InterfaceSwing/Imagens/perna1.png";
+                imagens[6] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/perna1.png"));
+                break;
+            case 7:
+                imagePath = "/InterfaceSwing/Imagens/perna2.png";
+                imagens[7] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/perna2.png"));
+                break;
+            case 8:
+                imagePath = "/InterfaceSwing/Imagens/olho1.png";
+                imagens[8] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/olho1.png"));
+                break;
+            case 9:
+                imagePath = "/InterfaceSwing/Imagens/olho2.png";
+                imagens[9] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/olho2.png"));
+                break;
+            case 10:
+                imagePath = "/InterfaceSwing/Imagens/boca.png";
+                imagens[10] = new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/boca.png"));
+                break;
+        }
+        saidaAtual.println("Imagem: " + imagePath);
+        saidaOutro.println("Imagem: " + imagePath);
+        
     }
 
     // tocar som
@@ -70,25 +146,6 @@ public class Server {
         return maximasTentativas;
     }
 
-    public int sortearTentativaFacil(){
-        Random random = new Random();
-        this.maximasTentativas = random.nextInt(3) + 16;
-        return this.maximasTentativas;
-    }
-
-    public int sortearTentativaMedia(){
-        Random random = new Random();
-        this.maximasTentativas = random.nextInt(3) + 12;
-        return this.maximasTentativas;
-    }
-
-    public int sortearTentativaDificil(){
-        Random random = new Random();
-        this.maximasTentativas = random.nextInt(3) + 10;
-        return this.maximasTentativas;
-        
-    }
-
     // criar uma mascara para a palavra
     public String criarMascara(String palavra) {
         StringBuilder mascara = new StringBuilder();
@@ -124,15 +181,15 @@ public class Server {
                 switch (dificuldade) {
                     case "Difícil":
                         palavra = escolherPalavra(palavrasDificeis);
-                        tentativas = sortearTentativaDificil();
+                        tentativas = 10;
                         break;
                     case "Médio":
                         palavra = escolherPalavra(palavrasMedias);
-                        tentativas = sortearTentativaMedia();
+                        tentativas = 10;
                         break;
                     case "Fácil":
                         palavra = escolherPalavra(palavras);
-                        tentativas = sortearTentativaFacil();
+                        tentativas = 10;
                         break;
                 }
             }
@@ -193,6 +250,7 @@ public class Server {
                             letrasErradas.append(letraTentada).append(" ");
                             tentativas--;
                             saidaAtual.println("Letra não encontrada! Tentativas: " + tentativas);
+                            adicionarErro(saidaAtual, saidaOutro);
 
                         }
                     }

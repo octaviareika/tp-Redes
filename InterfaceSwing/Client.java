@@ -20,6 +20,7 @@ public class Client extends JFrame {
     private PrintWriter out;
     private BufferedReader in;
     private Socket socket;
+    private JLabel imagemLabel;
 
     public Client() {
         try {
@@ -39,7 +40,7 @@ public class Client extends JFrame {
         }
 
         setTitle("Jogo da Forca");
-        setSize(1000, 800);
+        setSize(1300, 900);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // fecha a janela
 
         // Painel de tentativas (jogo)
@@ -73,6 +74,14 @@ public class Client extends JFrame {
         letraPanel.add(enviarLetra);
         topPanel.add(letraPanel);
         jogoPanel.add(topPanel, BorderLayout.NORTH);
+
+        // Adicionar imagem
+        imagemLabel = new JLabel();
+        // tamanho da imagem e inicialmente a iamgem sendo so a forca
+        imagemLabel.setIcon(new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/forca.png")));
+        // diminuir o tamanho da imagem
+        jogoPanel.add(imagemLabel, BorderLayout.CENTER);
+
 
         // Painel de chat
         chatPane = new JTextPane();
@@ -121,7 +130,7 @@ public class Client extends JFrame {
 
         // Dividir a interface em duas partes
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, jogoPanel, chatPanel);
-        splitPane.setDividerLocation(500); // Define a posição inicial do divisor
+        splitPane.setDividerLocation(700); // Define a posição inicial do divisor
 
         add(splitPane);
 
@@ -162,6 +171,11 @@ public class Client extends JFrame {
                                 } catch (BadLocationException ex) {
                                     ex.printStackTrace();
                                 }
+                            } else if (message.startsWith("Imagem: ")) {
+                                // Atualize a imagem
+                                String imagePath = message.substring(8);
+                                ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
+                                imagemLabel.setIcon(icon);
                             } else {
                                 try {
                                     doc.insertString(doc.getLength(), message + "\n", estiloNormal);
