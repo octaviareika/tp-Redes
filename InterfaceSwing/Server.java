@@ -7,7 +7,6 @@ import java.util.Set;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.swing.JOptionPane;
 import javax.swing.*;;
 
 public class Server {
@@ -230,9 +229,8 @@ public class Server {
 
                     if (letrasTentadas.contains(letraTentada)) {
                         playSound("musicas/letraErrada.wav");
-                        tentativas--;
                         saidaAtual.println("Letra já digitada! Tentativas: " + tentativas);
-
+                        continue;
                     } else {
                         letrasTentadas.add(letraTentada);
                         if (palavra.contains(tentativa)) {
@@ -281,21 +279,24 @@ public class Server {
     public void verificarVitoria(String palavra, String mascara, PrintWriter saidaAtual, 
         BufferedReader entradaAtual, PrintWriter saidaOutro, int jogadorAtual, int tentativas) throws IOException {
         if (mascara.equals(palavra) && tentativas > 0) {
-            playSound("musicas/vitoria.wav");
+            saidaAtual.println("TOCAR_MUSICA_VITORIA");
             JOptionPane.showMessageDialog(null, "Parabéns, jogador: " + jogadorAtual + " ! Você acertou a palavra: " + palavra);
             saidaAtual.println("Fim de jogo! Você venceu! ");
             saidaOutro.println("Fim de jogo! Você perdeu! ");
-           // playSound("musicas/jogoPerdido.wav");
+            System.out.println("TOCOU");
         }
 
         // se nenhum dos jogadores acertar a palavra
 
         if (tentativas <= 0) {
-            playSound("musicas/jogoPerdido.wav");
+            saidaAtual.println("TOCAR_MUSICA_DERROTA");
+            saidaOutro.println("TOCAR_MUSICA_DERROTA");
             saidaAtual.println("Você perdeu! A palavra era: " + palavra);
             saidaOutro.println("Você perdeu! A palavra era: " + palavra);
             saidaAtual.println("Fim de jogo!");
             saidaOutro.println("Fim de jogo!");
+            System.out.println("TOCOU");
+            
         }
     }
 

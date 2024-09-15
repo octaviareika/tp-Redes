@@ -1,5 +1,6 @@
 package InterfaceSwing;
 
+import java.io.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.*;
@@ -11,6 +12,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 public class Client extends JFrame {
     JTextField letraInput;
@@ -21,6 +25,19 @@ public class Client extends JFrame {
     private BufferedReader in;
     private Socket socket;
     private JLabel imagemLabel;
+
+    private void playSound(String filePath) {
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filePath).getAbsoluteFile());
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.start();
+        } catch (Exception e) {
+            System.out.println("Erro ao tocar o som: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
     public Client() {
         try {
@@ -161,7 +178,7 @@ public class Client extends JFrame {
             new Thread(new Runnable() { // thread fica lendo as mensagens do servidor
                 public void run() {
                     try {
-                        String message;
+                        String message; // mensagem que veio do servidor
                         while ((message = in.readLine()) != null) {
                             if (message.startsWith("Estado: ")) { // se a mensagem que veio do servidor começa com Estado:
                                 estadoLabel.setText(message);
@@ -176,6 +193,10 @@ public class Client extends JFrame {
                                 String imagePath = message.substring(8);
                                 ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
                                 imagemLabel.setIcon(icon);
+                            } else if (message.equals("TOCAR_MUSICA_VITORIA")) {
+                                playSound("musicas/win.wav");
+                            } else if (message.equals("TOCAR_MUSICA_DERROTA")) {
+                                playSound("musicas/jogoPerdido.wav");
                             } else {
                                 try {
                                     doc.insertString(doc.getLength(), message + "\n", estiloNormal);
@@ -198,13 +219,13 @@ public class Client extends JFrame {
 
     @Override
     public void dispose() {
-        int response = JOptionPane.showConfirmDialog(this, "Você realmente deseja sair?", "Sair", JOptionPane.YES_NO_OPTION);
+        // int response = JOptionPane.showConfirmDialog(this, "Você realmente deseja sair?", "Sair", JOptionPane.YES_NO_OPTION);
 
-        if (response == JOptionPane.YES_OPTION){
-            out.println("Sair");
-            super.dispose();
-            System.exit(0);
-        }
+        // if (response == JOptionPane.YES_OPTION){
+        //     out.println("Sair");
+        //     super.dispose();
+        //     System.exit(0);
+        // }
         try {
             if (out != null) out.close();
             if (in != null) in.close();
