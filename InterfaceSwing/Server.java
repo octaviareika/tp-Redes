@@ -280,6 +280,7 @@ public class Server {
         BufferedReader entradaAtual, PrintWriter saidaOutro, int jogadorAtual, int tentativas) throws IOException {
         if (mascara.equals(palavra) && tentativas > 0) {
             saidaAtual.println("TOCAR_MUSICA_VITORIA");
+            saidaOutro.println("TOCAR_MUSICA_DERROTA");
             JOptionPane.showMessageDialog(null, "Parabéns, jogador: " + jogadorAtual + " ! Você acertou a palavra: " + palavra);
             saidaAtual.println("Fim de jogo! Você venceu! ");
             saidaOutro.println("Fim de jogo! Você perdeu! ");
@@ -289,7 +290,7 @@ public class Server {
         // se nenhum dos jogadores acertar a palavra
 
         if (tentativas <= 0) {
-            saidaAtual.println("TOCAR_MUSICA_DERROTA");
+            saidaAtual.println("TOCAR_MUSICA_DERROTA"); // vai mandar a mensagem para o cliente
             saidaOutro.println("TOCAR_MUSICA_DERROTA");
             saidaAtual.println("Você perdeu! A palavra era: " + palavra);
             saidaOutro.println("Você perdeu! A palavra era: " + palavra);
