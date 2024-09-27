@@ -213,13 +213,15 @@ public class Server {
                 PrintWriter saidaOutro = (jogadorAtual == 1 ? saidaJogador2 : saidaJogador1); // PrintWriter serve para enviar mensagens para o cliente mas é o outro jogador
                 // Situação atual
                 
-                saidaAtual.println();
-                saidaOutro.println();
+
                 saidaAtual.println();
                 saidaOutro.println();
                 saidaAtual.println("-------------------------------------------");
                 saidaAtual.println("Vez de jogador " + jogadorAtual + " (Você)");
+                saidaAtual.println("-------------------------------------------");
+                saidaOutro.println("-------------------------------------------");
                 saidaOutro.println("Aguarde a vez do jogador " + jogadorAtual);
+                saidaOutro.println("-------------------------------------------");
 
 
                 mensagem = entradaAtual.readLine(); // le a mensagem do cliente
