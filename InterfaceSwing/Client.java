@@ -7,10 +7,6 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -38,7 +34,6 @@ public class Client extends JFrame {
         }
     }
 
-
     public Client() {
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -48,7 +43,6 @@ public class Client extends JFrame {
                 }
             }
         } catch (Exception e) {
-            // Caso o Nimbus não esteja disponível, usa o padrão do sistema.
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (Exception ex) {
@@ -58,7 +52,7 @@ public class Client extends JFrame {
 
         setTitle("Jogo da Forca");
         setSize(1300, 900);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // fecha a janela
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Painel de tentativas (jogo)
         estadoLabel = new JLabel("Estado: ");
@@ -71,8 +65,8 @@ public class Client extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String letra = letraInput.getText();
                 if (!letra.isEmpty()) {
-                    out.println("Tentativa: " + letra); // envia a letra para o servidor
-                    letraInput.setText(""); // faz ficar em branco dvnv
+                    out.println("Tentativa: " + letra);
+                    letraInput.setText("");
                 } else {
                     JOptionPane.showMessageDialog(null, "Digite uma letra para enviar.");
                 }
@@ -81,7 +75,7 @@ public class Client extends JFrame {
 
         JPanel jogoPanel = new JPanel();
         jogoPanel.setLayout(new BorderLayout());
-        jogoPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); // margem
+        jogoPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.add(estadoLabel);
@@ -94,18 +88,14 @@ public class Client extends JFrame {
 
         // Adicionar imagem
         imagemLabel = new JLabel();
-        // tamanho da imagem e inicialmente a iamgem sendo so a forca
         imagemLabel.setIcon(new ImageIcon(getClass().getResource("/InterfaceSwing/Imagens/forca.png")));
-        // diminuir o tamanho da imagem
         jogoPanel.add(imagemLabel, BorderLayout.CENTER);
-
 
         // Painel de chat
         chatPane = new JTextPane();
         chatPane.setEditable(false);
         StyledDocument doc = chatPane.getStyledDocument();
 
-        // Definir estilos
         Style estiloNegrito = chatPane.addStyle("Negrito", null);
         StyleConstants.setBold(estiloNegrito, true);
 
@@ -145,87 +135,94 @@ public class Client extends JFrame {
         chatInputPanel.add(enviarChatButton);
         chatPanel.add(chatInputPanel, BorderLayout.SOUTH);
 
-        // Dividir a interface em duas partes
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, jogoPanel, chatPanel);
-        splitPane.setDividerLocation(700); // Define a posição inicial do divisor
+        splitPane.setDividerLocation(700);
 
         add(splitPane);
 
-        try {
-            socket = new Socket("localhost", 8081); // socket do cliente conecta-se com o servidor
-            out = new PrintWriter(socket.getOutputStream(), true); // envia mensagens para o servidor
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream())); // recebe mensagens do servidor
+        connectToServer(); // Chame o método para conectar ao servidor
 
-            String[] opcoes = {"Fácil", "Médio", "Difícil"};
-            String dificuldade = (String) JOptionPane.showInputDialog(
-                    this,
-                    "Escolha a dificuldade:",
-                    "Seleção de Dificuldade",
-                    JOptionPane.PLAIN_MESSAGE,
-                    null,
-                    opcoes,
-                    opcoes[0]
-            );
-
-            if (dificuldade != null) {
-                out.println("Dificuldade: " + dificuldade); // envia a dificuldade escolhida para o servidor
-            } else {
-                JOptionPane.showMessageDialog(this, "Nenhuma dificuldade selecionada. O jogo será encerrado.");
-                dispose();
-                return;
-            }
-
-            new Thread(new Runnable() { // thread fica lendo as mensagens do servidor
-                public void run() {
-                    try {
-                        String message; // mensagem que veio do servidor
-                        while ((message = in.readLine()) != null) {
-                            if (message.startsWith("Estado: ")) { // se a mensagem que veio do servidor começa com Estado:
-                                estadoLabel.setText(message);
-                            } else if (message.startsWith("Chat: ")) {
-                                try {
-                                    doc.insertString(doc.getLength(), message.substring(6) + "\n", estiloNormal);
-                                } catch (BadLocationException ex) {
-                                    ex.printStackTrace();
-                                }
-                            } else if (message.startsWith("Imagem: ")) {
-                                // Atualize a imagem
-                                String imagePath = message.substring(8);
-                                ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
-                                imagemLabel.setIcon(icon);
-                            } else if (message.equals("TOCAR_MUSICA_VITORIA")) {
-                                playSound("musicas/win.wav");
-                            } else if (message.equals("TOCAR_MUSICA_DERROTA")) {
-                                playSound("musicas/jogoPerdido.wav");
-                            } else {
-                                try {
-                                    doc.insertString(doc.getLength(), message + "\n", estiloNormal);
-                                } catch (BadLocationException ex) {
-                                    ex.printStackTrace();
-                                }
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    String message;
+                    while ((message = in.readLine()) != null) {
+                        if (message.startsWith("Estado: ")) {
+                            estadoLabel.setText(message);
+                        } else if (message.startsWith("Chat: ")) {
+                            try {
+                                doc.insertString(doc.getLength(), message.substring(6) + "\n", estiloNormal);
+                            } catch (BadLocationException ex) {
+                                ex.printStackTrace();
+                            }
+                        } else if (message.startsWith("Imagem: ")) {
+                            String imagePath = message.substring(8);
+                            ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
+                            imagemLabel.setIcon(icon);
+                        } else if (message.equals("TOCAR_MUSICA_VITORIA")) {
+                            playSound("musicas/win.wav");
+                        } else if (message.equals("TOCAR_MUSICA_DERROTA")) {
+                            playSound("musicas/jogoPerdido.wav");
+                        } else {
+                            try {
+                                doc.insertString(doc.getLength(), message + "\n", estiloNormal);
+                            } catch (BadLocationException ex) {
+                                ex.printStackTrace();
                             }
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        dispose();
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    dispose();
                 }
-            }).start();
-        } catch (IOException e) {
-            e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private void connectToServer() {
+        String ipAddress = JOptionPane.showInputDialog(this, "Digite o IP do servidor:", "Conexão ao Servidor", JOptionPane.QUESTION_MESSAGE);
+        String portString = JOptionPane.showInputDialog(this, "Digite a porta do servidor:", "Conexão ao Servidor", JOptionPane.QUESTION_MESSAGE);
+
+        if (ipAddress != null && portString != null) {
+            try {
+                int port = Integer.parseInt(portString);
+                socket = new Socket(ipAddress, port);
+                out = new PrintWriter(socket.getOutputStream(), true);
+                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                String[] opcoes = {"Fácil", "Médio", "Difícil"};
+                String dificuldade = (String) JOptionPane.showInputDialog(
+                        this,
+                        "Escolha a dificuldade:",
+                        "Seleção de Dificuldade",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        opcoes,
+                        opcoes[0]
+                );
+
+                if (dificuldade != null) {
+                    out.println("Dificuldade: " + dificuldade);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Nenhuma dificuldade selecionada. O jogo será encerrado.");
+                    dispose();
+                }
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Erro ao conectar ao servidor: " + e.getMessage());
+                dispose();
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Por favor, insira um número válido para a porta.");
+                dispose();
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Conexão cancelada.");
+            dispose();
         }
     }
 
     @Override
     public void dispose() {
-        // int response = JOptionPane.showConfirmDialog(this, "Você realmente deseja sair?", "Sair", JOptionPane.YES_NO_OPTION);
-
-        // if (response == JOptionPane.YES_OPTION){
-        //     out.println("Sair");
-        //     super.dispose();
-        //     System.exit(0);
-        // }
         try {
             if (out != null) out.close();
             if (in != null) in.close();
